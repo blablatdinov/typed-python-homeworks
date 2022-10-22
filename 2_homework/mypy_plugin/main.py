@@ -1,15 +1,14 @@
 from mypy.plugin import Plugin
 from mypy.types import AnyType, NoneType, TypeOfAny
-from mypy.nodes import ClassDef, Argument, Var, ARG_STAR
+from mypy.nodes import ClassDef, Argument, Var, ARG_STAR, ARG_POS
 from mypy.plugins.common import add_method, add_method_to_class
 
 
 def analyze(ctx):
-    nameless_var = Var("")
     args = []
     for attr_name, attr_node in ctx.cls.info.mro[0].names.items():
         args.append(
-            Argument(nameless_var, attr_node.type, None, ARG_STAR),
+            Argument(Var(attr_name, attr_node.type), attr_node.type, None, ARG_POS),
         )
     add_method_to_class(
         ctx.api,
