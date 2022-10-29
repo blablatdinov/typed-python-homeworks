@@ -26,7 +26,7 @@ def valid_email(email: str) -> Email:
     return email
 
 
-def emails_from_csv() -> list[Email]:
+def emails_from_csv() -> IO[list[Email]]:
     with open('input.csv', 'r') as csv_file:
         emails = next(csv.reader(csv_file))
     res = []
@@ -38,7 +38,7 @@ def emails_from_csv() -> list[Email]:
             continue
         res.append(validated_email)
     logger.info(f'Found {len(res)} users for parsing')
-    return res
+    return IO(res)
 
 
 def users(emails: list[Email]) -> list[User]:
@@ -71,18 +71,12 @@ def parse_user_data(users: list[User]):
     for user in users:
         with suppress(FileExistsError):
             os.mkdir(f'users/{user.id}')
-        logger.info('Start parsing user with email "{user.email}"')
+        logger.info(f'Start parsing user with email "{user.email}"')
         parse_part(user.id, 'posts')
         parse_part(user.id, 'albums')
         parse_part(user.id, 'todos')
 
 
 if __name__ == '__main__':
-    print(
-        parse_user_data(
-            users(
-                emails_from_csv(),
-            )
-        )
-    )
+    emails_from_csv().map(users).map(parse_user_data)
 
