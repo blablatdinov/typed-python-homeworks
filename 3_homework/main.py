@@ -23,7 +23,7 @@ class User(object):
 def valid_email(email: str) -> Email:
     if '@' not in email:
         raise ValueError
-    return email
+    return Email(email)
 
 
 def emails_from_csv() -> IO[list[Email]]:
